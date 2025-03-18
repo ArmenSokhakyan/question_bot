@@ -137,7 +137,7 @@ async def send_anime_description(message: Message):
 
 async def wait_for_answer(message: Message):
     chat_id = message.chat.id
-    await asyncio.sleep(5)  # Ждем 60 секунд перед подсказкой
+    await asyncio.sleep(60)  # Ждем 60 секунд перед подсказкой
 
     if games[chat_id]["is_game_active"] and not games[chat_id]["hint_given"]:
         games[chat_id]["hint_given"] = True  # Фиксируем, что подсказка уже была дана
