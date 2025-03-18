@@ -27,16 +27,16 @@ categories = {
     "anime": "Аниме"
 }
 
-with open("anime_list.json", "r", encoding="utf-8") as file:
+with open("app/anime_list.json", "r", encoding="utf-8") as file:
     anime_list = json.load(file)
 
-with open("mlbb.json", "r", encoding="utf-8") as file:
+with open("app/mlbb.json", "r", encoding="utf-8") as file:
     mlbb_list = json.load(file)
 
-with open("films.json", "r", encoding="utf-8") as file:
+with open("app/films.json", "r", encoding="utf-8") as file:
     films = json.load(file)
 
-with open("serials.json", "r", encoding="utf-8") as file:
+with open("app/serials.json", "r", encoding="utf-8") as file:
     serials = json.load(file)
 
 def create_hint_keyboard() -> InlineKeyboardMarkup:
