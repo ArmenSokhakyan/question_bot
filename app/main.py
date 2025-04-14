@@ -16,10 +16,10 @@ bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
 games = {
-    -1002009840380: {"is_game_active": False, "player_scores": {}, "current_index": 0, "reserve_list": [], "timer_task": None},
-    -1002372051836: {"is_game_active": False, "player_scores": {}, "current_index": 0, "reserve_list": [], "timer_task": None}
+    -1002009840380: {"is_game_active": False, "player_scores": {}, "current_index": 0, "reserve_list": [], "timer_task": None}
 }
 
+# Добавляем категории
 categories = {
     "mlbb": "Mobile Legends",
     "movies": "Фильмы",
@@ -44,7 +44,7 @@ def create_hint_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="Подсказка", callback_data="hint")]
     ])
 
-# buttons with categories
+# Клавиатура с категориями
 def create_category_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="MLBB", callback_data="category_mlbb")],
@@ -87,6 +87,7 @@ async def handle_category(callback: CallbackQuery):
     elif category_key == "series":
         reserve_list = serials.copy()
 
+    # Если reserve_list по-прежнему пустой, то категория не была корректно выбрана
     if not reserve_list:
         reserve_list = []
 
@@ -120,16 +121,17 @@ async def send_anime_description(message: Message):
     chat_id = message.chat.id
 
     if games[chat_id]["reserve_list"]:
+        # Сбрасываем флаг перед новым вопросом
         games[chat_id]["hint_given"] = False
 
         anime = games[chat_id]["reserve_list"][games[chat_id]["current_index"]]
         await message.answer(f"Угадай {categories[games[chat_id]['category']]} по описанию:\n{anime['description']}")
 
-        # cancel prev timer
+        # Отменяем предыдущий таймер, если он существует
         if games[chat_id]["timer_task"]:
             games[chat_id]["timer_task"].cancel()
 
-        # load new timer
+        # Запускаем новый таймер
         games[chat_id]["timer_task"] = asyncio.create_task(wait_for_answer(message))
     else:
         await message.answer(f"Все {categories[games[chat_id]['category']]} были угаданы! Игра завершена.")
@@ -150,11 +152,11 @@ async def handle_hint(callback: CallbackQuery):
     if not games[chat_id]["is_game_active"]:
         return
 
-    # take current answer
+    # Получаем текущее аниме
     if games[chat_id]["reserve_list"]:
-        current_answer = games[chat_id]["reserve_list"][games[chat_id]["current_index"]]
+        current_anime = games[chat_id]["reserve_list"][games[chat_id]["current_index"]]
         await callback.message.answer(
-            f"Подсказка: Первые буквы названия — {current_answer['name'][:2]}..."
+            f"Подсказка: Первые буквы названия — {current_anime['name'][:2]}..."
         )
 
     games[chat_id]["hint_given"] = True  # Устанавливаем флаг, чтобы подсказка не дублировалась
@@ -168,8 +170,7 @@ async def stop(message: Message):
         return
     games[message.chat.id]["is_game_active"] = False
     await message.answer(f"Каин больше с Вами не играет!")
-
-    # send players rate
+    # Отправляем рейтинг игроков в конце игры
     if games[message.chat.id]["player_scores"]:
         ranking = sorted(games[message.chat.id]["player_scores"].items(), key=lambda x: x[1], reverse=True)
         ranking_message = "Рейтинг игроков:\n"
@@ -196,7 +197,7 @@ async def echo(message: Message) -> None:
                 games[chat_id]["player_scores"][player_name] = games[chat_id]["player_scores"].get(player_name, 0) + 1
                 await message.answer(f"@{player_name} Каин гордится тобой, правильно. 🎉")
 
-                # Cancel timer if answer is correct
+                # Отменяем таймер, потому что был правильный ответ
                 if games[chat_id]["timer_task"]:
                     games[chat_id]["timer_task"].cancel()
 
@@ -214,6 +215,8 @@ async def echo(message: Message) -> None:
 async def main() -> None:
     await dp.start_polling(bot)
 
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
+
