@@ -10,7 +10,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
-TOKEN = "7595011311:AAFRmsvGrXDPboyipgf7tLuWPBKShje6gSo"
+TOKEN = "7595011311:AAF0827OTNqQtyjAILUZvtjKKQ5ILcTCWk4"
 
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
